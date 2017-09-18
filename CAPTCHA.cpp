@@ -1,20 +1,24 @@
 #include <iostream>
+#include <stdio.h>
 #include <opencv2/opencv.hpp>
 
 using namespace std;
 using namespace cv;
 
-void GetPixelData2(Mat image, uchar* blue, uchar* green, uchar* red, int j, int i);
-int GetPixelData(Mat image, uchar* blue, uchar* green, uchar* red, int j, int i);
+int GetPixelData(Mat image, uchar* scale, int j, int i);
+
 int main(){
-	Mat image = imread("C:/Users/lawle/Documents/졸업논문/인터파크/0001.png", CV_LOAD_IMAGE_GRAYSCALE);
+	Mat image = imread("C:/Users/lawle/Documents/졸업논문/인터파크/0002.png", CV_LOAD_IMAGE_GRAYSCALE);
 
 	if (image.empty()) {
 		std::cout << "파일을 불러올 수 없습니다." << endl;
 		return -1;
 	}
 
-	uchar *blue, *green, *red;
+	namedWindow("원본", CV_WINDOW_AUTOSIZE);
+	imshow("원본", image);	
+
+	uchar *scale;
 	int i, j, check = 0;
 	int sRow, sCol, bRow, bCol;
 
@@ -25,11 +29,9 @@ int main(){
 
 	for (i = 0; i < nCol; i++) {
 		for (j = 0; j < nRow; j++) {
-			blue = nullptr;
-			green = nullptr;
-			red = nullptr;
+			scale = nullptr;
 
-			if (GetPixelData(image, blue, green, red, j, i) == 1) {
+			if (GetPixelData(image, scale, j, i) < 200) {
 				sRow = j;
 				sCol = i;
 				check = 1;
@@ -47,11 +49,9 @@ int main(){
 
 	for (j = nRow - 2; j >= 0; j--) {
 		for (i = nCol - 2; i >= 0; i--) {
-			blue = nullptr;
-			green = nullptr;
-			red = nullptr;
+			scale = nullptr;
 
-			if (GetPixelData(image, blue, green, red, j, i) == 1) {
+			if (GetPixelData(image, scale, j, i) < 200) {
 				bRow = j;
 				bCol = i;
 				check = 1;
@@ -69,23 +69,98 @@ int main(){
 
 	nRow = subimage.rows;
 	nCol = subimage.cols;
+
 	for (i = 0; i < nCol; i++) {
 		for (j = 0; j < nRow; j++) {
-			blue = nullptr;
-			green = nullptr;
-			red = nullptr;
-			GetPixelData2(subimage, blue, green, red, j, i);
+			scale = nullptr;
+
+			if (GetPixelData(subimage, scale, j, i) < 100) {
+				subimage.at<uchar>(j, i) = 255;
+			}
 		}
 	}
-	
-	namedWindow("image", CV_WINDOW_AUTOSIZE);
-	imshow("image", subimage);
+
+	for (i = 0; i < nCol; i++) {
+		for (j = 0; j < nRow; j++) {
+			scale = nullptr;
+
+			if (GetPixelData(subimage, scale, j, i) != 255) {
+				subimage.at<uchar>(j, i) = 0;
+			}
+		}
+	}
+
+	Mat medianimage;
+	Mat eroded;
+	Mat dilated;
+
+	dilate(subimage, dilated, Mat());
+	erode(dilated, eroded, Mat());
+	medianBlur(eroded, medianimage, 3);
+	namedWindow("d+e+m", CV_WINDOW_AUTOSIZE);
+	imshow("d+e+m", medianimage);
+
+	for (i = 0; i < nCol; i++) {
+		for (j = 0; j < nRow; j++) {
+			scale = nullptr;
+
+			if (i < 25 || j < 25 || i > (nCol-25) || j > (nRow-25)) {
+				medianimage.at<uchar>(j, i) = 255;
+			}
+		}
+	}
+
+
+	int start = 0, count = 0, st_col = 0, fin_col = 0, buf = 0;
+
+	Mat Letter[6];
+
+	for (i = 0; i < nCol; i++) {
+		count = 0;
+
+		for (j = 0; j < nRow; j++) {
+			scale = nullptr;
+			if (GetPixelData(medianimage, scale, j, i) == 0) {
+				count++;
+				if (start == 0) {
+					start++;
+					st_col = i;
+				}
+			}
+		}
+
+		if (start != 0 && count == 0) {
+			fin_col = i;
+			if (fin_col - st_col > 10) {
+				Rect rect2(st_col, 0, fin_col - st_col - 1, nRow - 1);
+				Letter[buf] = medianimage(rect2);
+				buf++;
+			}
+			start = 0;
+		}
+	}
+
+	namedWindow("Letter1", CV_WINDOW_AUTOSIZE);
+	imshow("Letter1", Letter[0]);
+	namedWindow("Letter2", CV_WINDOW_AUTOSIZE);
+	imshow("Letter2", Letter[1]);
+	namedWindow("Letter3", CV_WINDOW_AUTOSIZE);
+	imshow("Letter3", Letter[2]);
+	namedWindow("Letter4", CV_WINDOW_AUTOSIZE);
+	imshow("Letter4", Letter[3]);
+	namedWindow("Letter5", CV_WINDOW_AUTOSIZE);
+	imshow("Letter5", Letter[4]);
+	namedWindow("Letter6", CV_WINDOW_AUTOSIZE);
+	imshow("Letter6", Letter[5]);
+
+	namedWindow("제거", CV_WINDOW_AUTOSIZE);
+	imshow("제거", medianimage);
 
 	waitKey(0);
 	return 0;
 }
 
-int GetPixelData(Mat image, uchar* blue, uchar* green, uchar* red, int j, int i) {
+int GetPixelData(Mat image, uchar* scale, int j, int i) {
 	uchar *data = image.data;
 
 	int nRow = image.rows;
@@ -96,35 +171,9 @@ int GetPixelData(Mat image, uchar* blue, uchar* green, uchar* red, int j, int i)
 		return -1;
 	}
 
-	blue = image.data + j*image.step + i*image.elemSize() + 0;
-	green = image.data + j*image.step + i*image.elemSize() + 1;
-	red = image.data + j*image.step + i*image.elemSize() + 2;
+	scale = image.data + j*image.step + i*image.elemSize() + 0;
 
-	if ((int)*blue < 200 || (int)*green < 200 || (int)*red < 200)		
-		return 1;
-	else
-		return 0;
+	return (int)*scale;
 }
 
-void GetPixelData2(Mat image, uchar* blue, uchar* green, uchar* red, int j, int i) {
-	uchar *data = image.data;
 
-	int nRow = image.rows;
-	int nCol = image.cols;
-
-	if (i > nCol || j > nRow) {
-		cout << "Selected pixel is out of range." << endl;
-		return ;
-	}
-
-	blue = image.data + j*image.step + i*image.elemSize() + 0;
-	green = image.data + j*image.step + i*image.elemSize() + 1;
-	red = image.data + j*image.step + i*image.elemSize() + 2;
-
-	if ((int)*blue < 100 && (int)*red < 100 && (int)*green < 100) {
-		Vec3b* pixel = image.ptr<Vec3b>(j);
-		pixel[i][0] = 255;
-		pixel[i][1] = 255;
-		pixel[i][2] = 255;
-	}
-}
