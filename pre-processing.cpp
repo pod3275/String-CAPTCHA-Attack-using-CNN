@@ -14,12 +14,12 @@ int pixel_threshold = 120;
 int min_size = 180;
 
 int main() {
-// ¿øº» ÀÌ¹ÌÁö ÆÄÀÏ¸í
+// ì›ë³¸ ì´ë¯¸ì§€ íŒŒì¼ëª…
 	int imagename;
 	FILE *fp = fopen("remain.txt", "w");
 	
 	for (imagename = 0; imagename < 100;imagename++) {
-		char LOC[100] = "C:/Users/lawle/Downloads/ÀÎÅÍÆÄÅ©_eval/"; // ÀÌ¹ÌÁö ÀúÀå °æ·Î
+		char LOC[100] = "C:/Users/lawle/Downloads/ì¸í„°íŒŒí¬_eval/"; // ì´ë¯¸ì§€ ì €ì¥ ê²½ë¡œ
 		char NUM[20] = "", buffer[2], NUM2[20] = "";
 
 		int i;
@@ -37,23 +37,23 @@ int main() {
 		strcat(LOC, NUM);
 		strcat(LOC, ".png");
 
-		Mat image = imread(LOC, CV_LOAD_IMAGE_GRAYSCALE); // ¿øº» ÀÌ¹ÌÁö¸¦ GRAYSCALE·Î ºÒ·¯¿À±â
+		Mat image = imread(LOC, CV_LOAD_IMAGE_GRAYSCALE); // ì›ë³¸ ì´ë¯¸ì§€ë¥¼ GRAYSCALEë¡œ ë¶ˆëŸ¬ì˜¤ê¸°
 
 		if (image.empty()) {
-			std::cout << "ÆÄÀÏÀ» ºÒ·¯¿Ã ¼ö ¾ø½À´Ï´Ù." << endl;
+			std::cout << "íŒŒì¼ì„ ë¶ˆëŸ¬ì˜¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." << endl;
 			return -1;
 		}
 
 		uchar *scale;
 		int j, check = 0;
 		int sRow, sCol, bRow, bCol;
-		/* sRow, sCol : ¹è°æÀÌ ½ÃÀÛÇÏ´Â ºÎºĞÀÇ ¿ŞÂÊ À§ ²ÀÁöÁ¡ ÁÂÇ¥
-		bRow, bCol : ¹è°æÀÌ ½ÃÀÛÇÏ´Â ºÎºĞÀÇ ¿À¸¥ÂÊ ¾Æ·¡ ²ÀÁöÁ¡ ÁÂÇ¥*/
+		/* sRow, sCol : ë°°ê²½ì´ ì‹œì‘í•˜ëŠ” ë¶€ë¶„ì˜ ì™¼ìª½ ìœ„ ê¼­ì§€ì  ì¢Œí‘œ
+		bRow, bCol : ë°°ê²½ì´ ì‹œì‘í•˜ëŠ” ë¶€ë¶„ì˜ ì˜¤ë¥¸ìª½ ì•„ë˜ ê¼­ì§€ì  ì¢Œí‘œ*/
 
 		int nRow = image.rows;
 		int nCol = image.cols;
 
-		// ¹è°æÀÌ ½ÃÀÛÇÏ´Â ºÎºĞ ÀÚ¸£±â : ÇÈ¼¿ °ªÀÌ 200 ÀÌÇÏÀÎ ºÎºĞÀ» ¹è°æÀ¸·Î ÆÇ´Ü.
+		// ë°°ê²½ì´ ì‹œì‘í•˜ëŠ” ë¶€ë¶„ ìë¥´ê¸° : í”½ì…€ ê°’ì´ 200 ì´í•˜ì¸ ë¶€ë¶„ì„ ë°°ê²½ìœ¼ë¡œ íŒë‹¨.
 		for (i = 0; i < nCol; i++) {
 			for (j = 0; j < nRow; j++) {
 				scale = nullptr;
@@ -84,12 +84,12 @@ int main() {
 
 
 		Rect rect(sCol, sRow, bCol - sCol, bRow - sRow);
-		Mat subimage = image(rect); // ¹è°æÀÌ ½ÃÀÛÇÏ´Â ºÎºĞ = subimage·Î ÀúÀå.
+		Mat subimage = image(rect); // ë°°ê²½ì´ ì‹œì‘í•˜ëŠ” ë¶€ë¶„ = subimageë¡œ ì €ì¥.
 
 		nRow = subimage.rows;
 		nCol = subimage.cols;
 
-		// GRAYSCALE -> Black/White·Î º¯È¯. Threshold = 120.
+		// GRAYSCALE -> Black/Whiteë¡œ ë³€í™˜. Threshold = 120.
 		for (i = 0; i < nCol; i++) {
 			for (j = 0; j < nRow; j++) {
 				scale = nullptr;
@@ -99,7 +99,7 @@ int main() {
 			}
 		}
 		
-		// ÀâÀ½ Á¦°Å : °¡ÀåÀÚ¸® ºÎÅÍ 23 ÇÈ¼¿ ³»¿¡´Â ±ÛÀÚ°¡ ¾ø´Ù´Â Æ¯Â¡.
+		// ì¡ìŒ ì œê±° : ê°€ì¥ìë¦¬ ë¶€í„° 23 í”½ì…€ ë‚´ì—ëŠ” ê¸€ìê°€ ì—†ë‹¤ëŠ” íŠ¹ì§•.
 		for (i = 0; i < nCol; i++) {
 			for (j = 0; j < nRow; j++) {
 				scale = nullptr;
@@ -108,7 +108,7 @@ int main() {
 		}
 
 
-		// Morphology ¿¬»ê : CLOSE and OPEN
+		// Morphology ì—°ì‚° : CLOSE and OPEN
 		Mat CLOSE, OPEN;
 		Mat mask = getStructuringElement(MORPH_RECT, Size(3, 3), Point(1, 1));
 
@@ -175,10 +175,10 @@ int main() {
 			Letter[i] = (Mat)OPEN(rectangle);
 		}
 
-		// ´ÜÀÏ ¹®ÀÚ ÀÌ¹ÌÁö »çÀÌÁî¸¦ 32*32·Î Á¶Àı
+		// ë‹¨ì¼ ë¬¸ì ì´ë¯¸ì§€ ì‚¬ì´ì¦ˆë¥¼ 32*32ë¡œ ì¡°ì ˆ
 		for (i = 0; i < 6; i++) resize(Letter[i], Letter[i], Size(32, 32));
 
-		// ´ÜÀÏ ¹®ÀÚ 6°³ ÀÌ¹ÌÁö ÀúÀå.
+		// ë‹¨ì¼ ë¬¸ì 6ê°œ ì´ë¯¸ì§€ ì €ì¥.
 		char filename1[20] = "img";
 		strcat_s(filename1, NUM);
 		strcat_s(filename1, "_1.jpg");
@@ -212,7 +212,7 @@ int main() {
 	}
 }
 
-// Æ¯Á¤ À§Ä¡ÀÇ ÇÈ¼¿ °ªÀ» ºÒ·¯¿À´Â ÇÔ¼ö.
+// íŠ¹ì • ìœ„ì¹˜ì˜ í”½ì…€ ê°’ì„ ë¶ˆëŸ¬ì˜¤ëŠ” í•¨ìˆ˜.
 int GetPixelData(Mat image, uchar* scale, int j, int i) {
 	uchar *data = image.data;
 
