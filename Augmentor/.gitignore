@@ -1,0 +1,25 @@
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+# My additions 
+*.pyc
+*.egg
+*.egg-info
+.idea/
+dist/
+data/
+build/
+back/
+.cache/
+.tox/
+_build/
+_static/
+_templates/
+__pycache__/
+.ipynb_checkpoints/
